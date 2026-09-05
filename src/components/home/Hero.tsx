@@ -100,6 +100,9 @@ export default function Hero() {
     target: ref,
     offset: ["start start", "end start"],
   });
+  // Raw window scroll, in pixels. Element-relative progress is re-measured when
+  // the viewport resizes; this is not, which is what touch needs.
+  const { scrollY } = useScroll();
 
   const p = scrollFx ? scrollYProgress : undefined;
   const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "-6%"]);
@@ -111,12 +114,12 @@ export default function Hero() {
   const rowY = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const rowFade = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
 
-  // Touch keeps the dissolve — it is the whole point of the hero — but runs it
-  // through a one-way fade so a jumping scroll position can't flicker the copy
-  // back in. Opacity only; the parallax transforms stay off, they were the
+  // Touch keeps the dissolve — it is the whole point of the hero — but drives it
+  // from scrollY over a fixed, generous distance rather than from a fraction of
+  // the section. Opacity only; the parallax transforms stay off, they were the
   // expensive half.
-  const nameFadeOneWay = useOneWayFade(scrollYProgress, 0, 0.55);
-  const rowFadeOneWay = useOneWayFade(scrollYProgress, 0, 0.35);
+  const nameFadeOneWay = useOneWayFade(scrollY, 0, 900);
+  const rowFadeOneWay = useOneWayFade(scrollY, 0, 600);
   const fade = (desktop: MotionValue<number>, touch: MotionValue<number>) =>
     reduced ? undefined : scrollFx ? desktop : touch;
   const heatScroll = useTransform(scrollYProgress, [0, 1], [1, 0.35]);

@@ -41,24 +41,28 @@ export function useScrollLock(locked: boolean) {
 /**
  * A fade that can only fall.
  *
- * Mapping scroll progress straight onto opacity is fine with a mouse. On a
- * phone the browser chrome collapses mid-gesture, the viewport resizes, and
- * progress jumps — which read as the hero copy blinking out and back in.
+ * Feed this a value that does not jump — window scrollY, not a measured scroll
+ * *progress*. On a phone the browser chrome collapses mid-gesture and the
+ * viewport resizes, which throws element-relative progress both forwards and
+ * backwards; a backwards hop reads as the copy blinking back in, and a forwards
+ * hop latches it straight to nothing. scrollY is unaffected by either.
  *
- * This holds the lowest value it has reached, so a jump can only ever be
- * ignored, never replayed. It restores itself — smoothly, not with a snap —
- * once you are genuinely back at the top of the section.
+ * The ratchet is then just belt and braces: opacity can fall but never rise,
+ * so nothing can replay. It restores smoothly once you are back at the top.
+ *
+ * `from`/`to` are in whatever units `value` carries — pixels here.
  */
 export function useOneWayFade(
-  progress: MotionValue<number>,
-  from = 0,
-  to = 0.35
+  value: MotionValue<number>,
+  from: number,
+  to: number,
+  resetBelow = from + (to - from) * 0.05
 ) {
   const opacity = useMotionValue(1);
   const restoring = useRef<ReturnType<typeof animate> | null>(null);
 
-  useMotionValueEvent(progress, "change", (v) => {
-    if (v <= from + 0.02) {
+  useMotionValueEvent(value, "change", (v) => {
+    if (v <= resetBelow) {
       if (opacity.get() < 1 && !restoring.current) {
         const a = animate(opacity, 1, { duration: 0.4, ease: [0.16, 1, 0.3, 1] });
         restoring.current = a;
