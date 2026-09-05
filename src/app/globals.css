@@ -1,26 +1,283 @@
 @import "tailwindcss";
 
+/* ============================================================
+   MITHIN SAGAR — DESIGN SYSTEM
+   Palette: warm near-black · burnt orange · ember · deep red · bone
+   ============================================================ */
+
+@theme {
+  /* --- surfaces (warm blacks, never neutral grey) --- */
+  --color-void: #050302;
+  --color-ink: #0a0705;
+  --color-ash: #120d0a;
+  --color-char: #1c1410;
+  --color-stone: #2a201a;
+
+  /* --- light --- */
+  --color-ember: #ff5a1f;
+  --color-flame: #ff9146;
+  --color-glow: #ffc48a;
+  --color-rust: #c43c0c;
+  --color-blood: #6e1004;
+
+  /* --- type --- */
+  --color-bone: #f4eee7;
+  --color-linen: #ddd2c6;
+  --color-dust: #9d8d80;
+  --color-mute: #8b7a6d;
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quint: cubic-bezier(0.83, 0, 0.17, 1);
+
+  --breakpoint-xs: 26rem;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --page-inset: 0.5rem;
+  --page-radius: 1.25rem;
+  --nav-h: 4.5rem;
+  color-scheme: dark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@media (min-width: 768px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --page-inset: 0.875rem;
+    --page-radius: 1.75rem;
+    --nav-h: 5.25rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    border-color: color-mix(in oklab, var(--color-bone) 8%, transparent);
+  }
+
+  html {
+    background: var(--color-void);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-void);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background: var(--color-ember);
+    color: var(--color-void);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-flame);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Lenis */
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+}
+
+@layer base {
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--color-rust) 55%, var(--color-ink));
+    border-radius: 99px;
+    border: 2px solid var(--color-void);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-ember);
+  }
+}
+
+/* ============================================================
+   TYPE UTILITIES
+   ============================================================ */
+
+@utility display {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 0.86;
+  text-wrap: balance;
+}
+
+@utility label {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
+
+@utility label-sm {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+@utility accent {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+@utility body-lg {
+  font-size: clamp(1rem, 0.94rem + 0.3vw, 1.1875rem);
+  line-height: 1.62;
+  color: var(--color-linen);
+  letter-spacing: -0.005em;
+}
+
+/* ============================================================
+   SURFACES
+   ============================================================ */
+
+@utility hairline {
+  border: 1px solid color-mix(in oklab, var(--color-bone) 9%, transparent);
+}
+
+/* Restrained glass — floating chrome only, never content blocks */
+@utility glass {
+  background: color-mix(in oklab, var(--color-ash) 92%, transparent);
+  backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid color-mix(in oklab, var(--color-bone) 10%, transparent);
+}
+
+@utility glass-strong {
+  background: color-mix(in oklab, var(--color-ink) 96%, transparent);
+  backdrop-filter: blur(18px) saturate(1.35);
+  border: 1px solid color-mix(in oklab, var(--color-bone) 12%, transparent);
+}
+
+@utility panel {
+  background: linear-gradient(
+    160deg,
+    color-mix(in oklab, var(--color-char) 70%, transparent) 0%,
+    color-mix(in oklab, var(--color-ink) 80%, transparent) 100%
+  );
+  border: 1px solid color-mix(in oklab, var(--color-bone) 8%, transparent);
+}
+
+/* ============================================================
+   ATMOSPHERE
+   ============================================================ */
+
+.grain {
+  contain: paint;
+}
+
+.grain::after {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 8s steps(5) infinite;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate3d(0, 0, 0); }
+  20% { transform: translate3d(-2%, 1.5%, 0); }
+  40% { transform: translate3d(1.5%, -2%, 0); }
+  60% { transform: translate3d(-2%, -1.5%, 0); }
+  80% { transform: translate3d(2%, 2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+
+@utility edge-fade-b {
+  mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+
+@utility edge-fade-x {
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+/* ============================================================
+   INTERACTIONS
+   ============================================================ */
+
+.link-underline {
+  position: relative;
+  display: inline-block;
+}
+.link-underline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  height: 1px;
+  width: 100%;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.5s var(--ease-out-expo);
+}
+.link-underline:hover::after,
+.link-underline:focus-visible::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.mask-line {
+  display: block;
+  overflow: hidden;
+}
+
+/* ============================================================
+   MOTION PREFERENCES
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .grain::after {
+    animation: none;
+  }
+}
+
+/* Hide native cursor only while the custom cursor is live */
+body[data-custom-cursor="on"],
+body[data-custom-cursor="on"] * {
+  cursor: none !important;
 }
