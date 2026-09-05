@@ -219,6 +219,22 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
+/* The hero frame. Phones get a min-height so tall content can push it; from
+   md up the height is definite, which keeps flex sizing and the bottom-anchored
+   portrait pixel-identical across engines. */
+.hero-frame {
+  min-height: calc(100vh - var(--page-inset));
+  min-height: calc(100svh - var(--page-inset));
+}
+
+@media (min-width: 768px) {
+  .hero-frame {
+    height: calc(100vh - var(--page-inset));
+    height: calc(100svh - var(--page-inset));
+    min-height: 40rem;
+  }
+}
+
 @utility edge-fade-b {
   mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
 }

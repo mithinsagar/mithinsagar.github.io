@@ -9,12 +9,10 @@ import { useReducedMotion } from "@/lib/hooks";
 import Grain from "@/components/chrome/Grain";
 import Embers from "@/components/chrome/Embers";
 
-const MASK = {
-  maskImage:
-    "linear-gradient(to bottom, #000 0%, #000 66%, rgba(0,0,0,0.8) 84%, transparent 100%)",
-  WebkitMaskImage:
-    "linear-gradient(to bottom, #000 0%, #000 66%, rgba(0,0,0,0.8) 84%, transparent 100%)",
-} as const;
+const FADE =
+  "linear-gradient(to bottom, #000 0%, #000 64%, rgba(0,0,0,0.78) 82%, transparent 99%)";
+
+const MASK = { maskImage: FADE, WebkitMaskImage: FADE } as const;
 
 /* ------------------------------------------------------------------ *
  * The lit environment. Four stacked radial fields rather than one
@@ -119,11 +117,8 @@ export default function Hero() {
       aria-label="Introduction"
     >
       <div
-        className="relative flex min-h-[640px] w-full flex-col overflow-hidden"
-        style={{
-          minHeight: "calc(100svh - var(--page-inset))",
-          borderRadius: "var(--page-radius)",
-        }}
+        className="hero-frame relative flex w-full flex-col overflow-hidden"
+        style={{ borderRadius: "var(--page-radius)" }}
       >
         {/* ---------- environment ---------- */}
         <motion.div
@@ -142,35 +137,27 @@ export default function Hero() {
           className="absolute inset-x-0 bottom-0 z-[3] flex justify-center"
           style={{ y: s(portraitY), scale: s(portraitScale), opacity: s(portraitFade) }}
         >
+          {/* Width is a share of the hero frame, not of the viewport, so a
+              visible scrollbar can't change the figure's size or position. */}
           <motion.div
-            className="relative"
+            className="relative w-[128%] shrink-0 sm:w-[88%] md:w-[78%] lg:w-[61%] xl:w-[53%] 2xl:w-[47%]"
             initial={{ opacity: 0, y: 34, scale: 1.05 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 2.2, ease: EASE, delay: 0.55 }}
           >
-            {/* rim halo behind the shoulders */}
-            <motion.div
-              aria-hidden
-              className="absolute left-1/2 top-[2%] -z-10 h-[74%] w-[140%] -translate-x-1/2 rounded-full blur-3xl"
-              style={{
-                background:
-                  "radial-gradient(closest-side, rgba(255,150,70,0.42), rgba(220,70,20,0.16) 55%, transparent 78%)",
-              }}
-              initial={{ opacity: 0, scale: 0.86 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 2.6, ease: EASE, delay: 1.1 }}
-            />
-            <div className="relative w-[124vw] max-w-none translate-x-[10%] translate-y-[2%] sm:w-[86vw] sm:translate-x-0 md:w-[76vw] lg:w-[60vw] xl:w-[52vw] 2xl:w-[46vw]">
-              {/* light wrap — a blurred copy of the silhouette, screened back over
-                  the field so the cut-out edge dissolves instead of ending on a line */}
-              {/* eslint-disable-next-line @next/next/no-img-element -- decorative
-                  light-wrap layer; shares the cached src with the Image above */}
-              <img
-                src="/portrait/mithin.webp"
+            <div className="relative translate-x-[9%] translate-y-[1.5%] sm:translate-x-0">
+              {/* Light wrap. Pre-blurred at build time on a canvas 18% larger than
+                  the figure, so there is nothing for a mask or a filter region to
+                  clip — the glow simply runs out of alpha before it runs out of box. */}
+              <motion.img
+                src="/portrait/mithin-glow.webp"
                 aria-hidden
                 alt=""
-                className="pointer-events-none absolute inset-0 h-full w-full scale-[1.04] select-none object-contain opacity-60 blur-[22px] saturate-[1.6]"
-                style={{ mixBlendMode: "screen", ...MASK }}
+                className="pointer-events-none absolute max-w-none select-none"
+                style={{ inset: "-18%", width: "136%", height: "136%", mixBlendMode: "screen" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.85 }}
+                transition={{ duration: 2.6, ease: EASE, delay: 0.9 }}
               />
               <Image
                 src="/portrait/mithin@2x.webp"
@@ -178,7 +165,7 @@ export default function Hero() {
                 width={2558}
                 height={2098}
                 priority
-                sizes="(max-width: 640px) 124vw, (max-width: 1024px) 76vw, 60vw"
+                sizes="(max-width: 640px) 128vw, (max-width: 1024px) 78vw, 61vw"
                 className="relative h-auto w-full select-none object-contain"
                 style={MASK}
               />
