@@ -156,7 +156,7 @@ export default function Hero() {
                 className="pointer-events-none absolute max-w-none select-none"
                 style={{ inset: "-18%", width: "136%", height: "136%", mixBlendMode: "screen" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.85 }}
+                animate={{ opacity: 0.66 }}
                 transition={{ duration: 2.6, ease: EASE, delay: 0.9 }}
               />
               <Image
