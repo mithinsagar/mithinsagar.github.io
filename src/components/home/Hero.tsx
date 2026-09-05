@@ -2,10 +2,16 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
 import { site } from "@/data/site";
 import { EASE } from "@/lib/motion";
-import { useIsDesktop, useOneWayFade, useReducedMotion } from "@/lib/hooks";
+import { useIsDesktop, useReducedMotion } from "@/lib/hooks";
 import Grain from "@/components/chrome/Grain";
 import Embers from "@/components/chrome/Embers";
 
@@ -116,10 +122,14 @@ export default function Hero() {
 
   // Touch keeps the dissolve — it is the whole point of the hero — but drives it
   // from scrollY over a fixed, generous distance rather than from a fraction of
-  // the section. Opacity only; the parallax transforms stay off, they were the
-  // expensive half.
-  const nameFadeOneWay = useOneWayFade(scrollY, 0, 900);
-  const rowFadeOneWay = useOneWayFade(scrollY, 0, 600);
+  // the section, and runs it through a spring. The spring is what makes it read
+  // as smooth in both directions: it glides into every new value instead of
+  // snapping, which also absorbs the small scroll shift a collapsing browser
+  // chrome causes. Opacity only; the parallax transforms stay off, they were
+  // the expensive half.
+  const SPRING = { stiffness: 110, damping: 26, restDelta: 0.0005 } as const;
+  const nameFadeTouch = useSpring(useTransform(scrollY, [0, 900], [1, 0]), SPRING);
+  const rowFadeTouch = useSpring(useTransform(scrollY, [0, 600], [1, 0]), SPRING);
   const fade = (desktop: MotionValue<number>, touch: MotionValue<number>) =>
     reduced ? undefined : scrollFx ? desktop : touch;
   const heatScroll = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
@@ -227,7 +237,7 @@ export default function Hero() {
             {/* name */}
             <motion.div
               className="lg:col-span-7 xl:col-span-6"
-              style={{ y: s(nameY), opacity: fade(nameFade, nameFadeOneWay) }}
+              style={{ y: s(nameY), opacity: fade(nameFade, nameFadeTouch) }}
             >
               <div className="overflow-hidden">
                 <motion.p
@@ -282,7 +292,7 @@ export default function Hero() {
           {/* ---------- bottom row ---------- */}
           <motion.div
             className="mt-8 flex flex-col gap-5 md:mt-10 md:gap-7"
-            style={{ y: s(rowY), opacity: fade(rowFade, rowFadeOneWay) }}
+            style={{ y: s(rowY), opacity: fade(rowFade, rowFadeTouch) }}
           >
             {/* statement — mobile position, sitting on the dark base */}
             <motion.div

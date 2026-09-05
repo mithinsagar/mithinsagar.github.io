@@ -2,7 +2,13 @@
 
 import { useRef } from "react";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "motion/react";
+import {
+  motion,
+  useMotionTemplate,
+  useScroll,
+  useSpring,
+  useTransform,
+} from "motion/react";
 import { gradeFor, photos } from "@/data/photos";
 import { Container } from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
@@ -15,16 +21,17 @@ export default function PhotoStrip() {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
   const isDesktop = useIsDesktop();
-  // Driving the track with a scroll-linked transform means every scroll frame
-  // repaints a very wide row of photos. That is fine with a mouse and janky on
-  // a phone, so touch sizes get a native horizontal scroller instead — the
-  // compositor handles it, with real momentum and snapping.
-  const parallax = isDesktop && !reduced;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
-  const x = useTransform(scrollYProgress, [0, 1], ["4%", "-34%"]);
+  // The track travels as the section passes — same on every size. On a phone
+  // scroll events arrive coarsely, so the row steps between them instead of
+  // gliding; a spring is what turns that into smooth motion. Desktop keeps the
+  // raw value, where the events are already fine-grained enough.
+  const travel = useTransform(scrollYProgress, [0, 1], [4, -34]);
+  const smooth = useSpring(travel, { stiffness: 60, damping: 22, restDelta: 0.002 });
+  const x = useMotionTemplate`${isDesktop ? travel : smooth}%`;
 
   const list = picks
     .map((id) => photos.find((p) => p.id === id))
@@ -46,21 +53,18 @@ export default function PhotoStrip() {
         />
       </Container>
 
-      <div
-        className={`mt-14 md:mt-20 ${
-          parallax
-            ? "overflow-hidden"
-            : "snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        }`}
-      >
+      <div className="mt-14 overflow-hidden md:mt-20">
         <motion.div
           className="flex w-max gap-4 px-6 md:gap-6 md:px-10"
-          style={{ x: parallax ? x : 0 }}
+          // Promoting the track to its own layer turns the travel into a
+          // compositor transform, so a wide row of photos is not repainted on
+          // every scroll frame — that repaint was the judder.
+          style={{ x: reduced ? 0 : x, willChange: "transform" }}
         >
           {list.map((p, i) => (
             <figure
               key={p.id}
-              className="group relative shrink-0 snap-start overflow-hidden rounded-xl border border-bone/[0.08] bg-ink"
+              className="group relative shrink-0 overflow-hidden rounded-xl border border-bone/[0.08] bg-ink"
               style={{
                 width: p.w >= p.h ? "clamp(19rem, 30vw, 30rem)" : "clamp(13rem, 20vw, 20rem)",
                 aspectRatio: `${p.w} / ${p.h}`,
