@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { site } from "@/data/site";
 import { EASE } from "@/lib/motion";
-import { useIsDesktop, useReducedMotion } from "@/lib/hooks";
+import { useIsDesktop, useOneWayFade, useReducedMotion } from "@/lib/hooks";
 import Grain from "@/components/chrome/Grain";
 import Embers from "@/components/chrome/Embers";
 
@@ -110,6 +110,15 @@ export default function Hero() {
   const asideY = useTransform(scrollYProgress, [0, 1], [0, -90]);
   const rowY = useTransform(scrollYProgress, [0, 1], [0, -40]);
   const rowFade = useTransform(scrollYProgress, [0, 0.35], [1, 0]);
+
+  // Touch keeps the dissolve — it is the whole point of the hero — but runs it
+  // through a one-way fade so a jumping scroll position can't flicker the copy
+  // back in. Opacity only; the parallax transforms stay off, they were the
+  // expensive half.
+  const nameFadeOneWay = useOneWayFade(scrollYProgress, 0, 0.55);
+  const rowFadeOneWay = useOneWayFade(scrollYProgress, 0, 0.35);
+  const fade = (desktop: MotionValue<number>, touch: MotionValue<number>) =>
+    reduced ? undefined : scrollFx ? desktop : touch;
   const heatScroll = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
   const still = useTransform(scrollYProgress, () => 1);
 
@@ -215,7 +224,7 @@ export default function Hero() {
             {/* name */}
             <motion.div
               className="lg:col-span-7 xl:col-span-6"
-              style={{ y: s(nameY), opacity: s(nameFade) }}
+              style={{ y: s(nameY), opacity: fade(nameFade, nameFadeOneWay) }}
             >
               <div className="overflow-hidden">
                 <motion.p
@@ -270,7 +279,7 @@ export default function Hero() {
           {/* ---------- bottom row ---------- */}
           <motion.div
             className="mt-8 flex flex-col gap-5 md:mt-10 md:gap-7"
-            style={{ y: s(rowY), opacity: s(rowFade) }}
+            style={{ y: s(rowY), opacity: fade(rowFade, rowFadeOneWay) }}
           >
             {/* statement — mobile position, sitting on the dark base */}
             <motion.div
