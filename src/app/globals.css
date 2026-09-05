@@ -261,22 +261,31 @@
    around it, so the head drifts downward as the window gets taller — full
    screen most of all. Tying the width to --hero-h holds the framing steady;
    the 86% term only caps it on short, wide windows. */
+/* Phones: the frame is tall and narrow, so the figure is driven by width and
+   deliberately cropped. It has to be large enough that the head clears the
+   copy underneath it — on a phone the face and the text can only be separated
+   vertically, there is no room to put them side by side. */
 .hero-figure {
-  width: 128%;
+  width: 155%;
 }
 @media (min-width: 640px) {
   .hero-figure {
-    width: 88%;
+    width: 104%;
   }
 }
 @media (min-width: 768px) {
-  /* Leave a constant 6rem of headroom under the fixed navbar and let the figure
-     take the rest of the frame's height. 1.219 is the portrait's own width-to-
-     height ratio, so this sets the height and the width follows. Keeping the
-     headroom constant — rather than the width — is what stops the head drifting
-     down as the window gets taller. */
+  /* From md up the figure is driven by the frame's HEIGHT: a constant 6rem of
+     headroom under the navbar, and the rest of the frame below it. 1.219 is the
+     portrait's own width-to-height ratio, so this sets the height and lets the
+     width follow. Holding the headroom constant — rather than the width — is
+     what stops the head drifting down as the window gets taller.
+
+     The 2.5rem bottom margin lifts the figure just clear of the frame's edge,
+     which lets it be a little smaller without the head dropping with it. Its
+     bottom is already faded to nothing, so nothing shows there. */
   .hero-figure {
-    width: min(86%, calc((var(--hero-h) - 6rem) * 1.219));
+    width: min(86%, calc((var(--hero-h) - 6rem - 2.5rem) * 1.219));
+    margin-bottom: 2.5rem;
   }
 }
 

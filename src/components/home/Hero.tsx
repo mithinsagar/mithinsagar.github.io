@@ -146,7 +146,7 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 2.2, ease: EASE, delay: 0.55 }}
           >
-            <div className="relative translate-x-[9%] sm:translate-x-0">
+            <div className="relative translate-x-[6%] sm:translate-x-0">
               {/* Light wrap. Pre-blurred at build time on a canvas 18% larger than
                   the figure, so there is nothing for a mask or a filter region to
                   clip — the glow simply runs out of alpha before it runs out of box. */}
@@ -192,17 +192,17 @@ export default function Hero() {
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 bottom-0 z-[4] h-[38%]"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-[4] h-[48%] sm:h-[38%]"
           style={{
             background:
-              "linear-gradient(to top, rgba(6,3,1,0.94) 0%, rgba(8,3,1,0.6) 44%, transparent 100%)",
+              "linear-gradient(to top, rgba(6,3,1,0.95) 0%, rgba(8,3,1,0.66) 42%, transparent 100%)",
           }}
         />
         <Grain className="z-[5]" />
 
         {/* ---------- content ---------- */}
         <div
-          className="relative z-10 flex flex-1 flex-col px-6 pb-6 md:px-10 md:pb-9"
+          className="relative z-10 flex flex-1 flex-col px-6 pb-5 md:px-10 md:pb-9"
           style={{ paddingTop: "calc(var(--nav-h) + 1.5rem)" }}
         >
           <div className="grid flex-1 grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:items-center">
@@ -263,7 +263,7 @@ export default function Hero() {
 
           {/* ---------- bottom row ---------- */}
           <motion.div
-            className="mt-8 flex flex-col gap-7 md:mt-10"
+            className="mt-8 flex flex-col gap-5 md:mt-10 md:gap-7"
             style={{ y: s(rowY), opacity: s(rowFade) }}
           >
             {/* statement — mobile position, sitting on the dark base */}
