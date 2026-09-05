@@ -7,13 +7,19 @@ import { gradeFor, photos } from "@/data/photos";
 import { Container } from "@/components/ui/Section";
 import SectionHeading from "@/components/ui/SectionHeading";
 import ArrowLink from "@/components/ui/ArrowLink";
-import { useReducedMotion } from "@/lib/hooks";
+import { useIsDesktop, useReducedMotion } from "@/lib/hooks";
 
 const picks = ["live-01", "live-04", "live-02", "live-05", "live-03", "live-06"];
 
 export default function PhotoStrip() {
   const ref = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
+  const isDesktop = useIsDesktop();
+  // Driving the track with a scroll-linked transform means every scroll frame
+  // repaints a very wide row of photos. That is fine with a mouse and janky on
+  // a phone, so touch sizes get a native horizontal scroller instead — the
+  // compositor handles it, with real momentum and snapping.
+  const parallax = isDesktop && !reduced;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
@@ -40,15 +46,21 @@ export default function PhotoStrip() {
         />
       </Container>
 
-      <div className="mt-14 overflow-hidden md:mt-20">
+      <div
+        className={`mt-14 md:mt-20 ${
+          parallax
+            ? "overflow-hidden"
+            : "snap-x snap-mandatory overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        }`}
+      >
         <motion.div
           className="flex w-max gap-4 px-6 md:gap-6 md:px-10"
-          style={{ x: reduced ? 0 : x }}
+          style={{ x: parallax ? x : 0 }}
         >
           {list.map((p, i) => (
             <figure
               key={p.id}
-              className="group relative shrink-0 overflow-hidden rounded-xl border border-bone/[0.08] bg-ink"
+              className="group relative shrink-0 snap-start overflow-hidden rounded-xl border border-bone/[0.08] bg-ink"
               style={{
                 width: p.w >= p.h ? "clamp(19rem, 30vw, 30rem)" : "clamp(13rem, 20vw, 20rem)",
                 aspectRatio: `${p.w} / ${p.h}`,

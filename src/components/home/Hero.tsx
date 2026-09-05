@@ -5,7 +5,7 @@ import Image from "next/image";
 import { motion, useScroll, useTransform, type MotionValue } from "motion/react";
 import { site } from "@/data/site";
 import { EASE } from "@/lib/motion";
-import { useReducedMotion } from "@/lib/hooks";
+import { useIsDesktop, useReducedMotion } from "@/lib/hooks";
 import Grain from "@/components/chrome/Grain";
 import Embers from "@/components/chrome/Embers";
 
@@ -90,12 +90,18 @@ function Statement() {
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
+  const isDesktop = useIsDesktop();
+  // Scroll-linked dissolve is a desktop effect. On a phone the browser chrome
+  // collapses as you scroll, which resizes the viewport mid-gesture and makes
+  // the tied opacities jump — the statement was blinking out and back. Touch
+  // sizes keep the hero static and just scroll past it.
+  const scrollFx = isDesktop && !reduced;
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"],
   });
 
-  const p = reduced ? undefined : scrollYProgress;
+  const p = scrollFx ? scrollYProgress : undefined;
   const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "-6%"]);
   const portraitScale = useTransform(scrollYProgress, [0, 1], [1, 1.12]);
   const portraitFade = useTransform(scrollYProgress, [0, 0.75], [1, 0.12]);
@@ -107,7 +113,7 @@ export default function Hero() {
   const heatScroll = useTransform(scrollYProgress, [0, 1], [1, 0.35]);
   const still = useTransform(scrollYProgress, () => 1);
 
-  const s = (v: MotionValue<number> | MotionValue<string>) => (reduced ? undefined : v);
+  const s = (v: MotionValue<number> | MotionValue<string>) => (scrollFx ? v : undefined);
 
   return (
     <section
