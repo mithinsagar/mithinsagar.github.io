@@ -219,19 +219,64 @@
   100% { transform: translate3d(0, 0, 0); }
 }
 
-/* The hero frame. Phones get a min-height so tall content can push it; from
-   md up the height is definite, which keeps flex sizing and the bottom-anchored
-   portrait pixel-identical across engines. */
+/* One source of truth for the hero's height, so the frame and the figure
+   inside it can never drift apart. vh first so the value is always valid;
+   svh refines it where supported. */
+:root {
+  --hero-h: calc(100vh - var(--page-inset));
+}
+@supports (height: 100svh) {
+  :root {
+    --hero-h: calc(100svh - var(--page-inset));
+  }
+}
+@media (min-width: 768px) {
+  :root {
+    --hero-h: max(40rem, calc(100vh - var(--page-inset)));
+  }
+}
+@supports (height: 100svh) {
+  @media (min-width: 768px) {
+    :root {
+      --hero-h: max(40rem, calc(100svh - var(--page-inset)));
+    }
+  }
+}
+
+/* Phones get a min-height so tall content can push the frame; from md up the
+   height is definite, which keeps flex sizing and the bottom-anchored figure
+   identical across engines. */
 .hero-frame {
-  min-height: calc(100vh - var(--page-inset));
-  min-height: calc(100svh - var(--page-inset));
+  min-height: var(--hero-h);
 }
 
 @media (min-width: 768px) {
   .hero-frame {
-    height: calc(100vh - var(--page-inset));
-    height: calc(100svh - var(--page-inset));
-    min-height: 40rem;
+    height: var(--hero-h);
+  }
+}
+
+/* The figure is sized from the frame's HEIGHT, not the viewport's width. A
+   width-driven figure keeps its size while a taller window grows the frame
+   around it, so the head drifts downward as the window gets taller — full
+   screen most of all. Tying the width to --hero-h holds the framing steady;
+   the 86% term only caps it on short, wide windows. */
+.hero-figure {
+  width: 128%;
+}
+@media (min-width: 640px) {
+  .hero-figure {
+    width: 88%;
+  }
+}
+@media (min-width: 768px) {
+  /* Leave a constant 6rem of headroom under the fixed navbar and let the figure
+     take the rest of the frame's height. 1.219 is the portrait's own width-to-
+     height ratio, so this sets the height and the width follows. Keeping the
+     headroom constant — rather than the width — is what stops the head drifting
+     down as the window gets taller. */
+  .hero-figure {
+    width: min(86%, calc((var(--hero-h) - 6rem) * 1.219));
   }
 }
 

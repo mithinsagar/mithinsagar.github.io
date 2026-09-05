@@ -137,15 +137,16 @@ export default function Hero() {
           className="absolute inset-x-0 bottom-0 z-[3] flex justify-center"
           style={{ y: s(portraitY), scale: s(portraitScale), opacity: s(portraitFade) }}
         >
-          {/* Width is a share of the hero frame, not of the viewport, so a
-              visible scrollbar can't change the figure's size or position. */}
+          {/* Sized from the frame's height (see .hero-figure) so the head keeps
+              its position as the window gets taller, and so a visible scrollbar
+              can't change the figure either. */}
           <motion.div
-            className="relative w-[128%] shrink-0 sm:w-[88%] md:w-[78%] lg:w-[61%] xl:w-[53%] 2xl:w-[47%]"
+            className="hero-figure relative shrink-0"
             initial={{ opacity: 0, y: 34, scale: 1.05 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 2.2, ease: EASE, delay: 0.55 }}
           >
-            <div className="relative translate-x-[9%] translate-y-[1.5%] sm:translate-x-0">
+            <div className="relative translate-x-[9%] sm:translate-x-0">
               {/* Light wrap. Pre-blurred at build time on a canvas 18% larger than
                   the figure, so there is nothing for a mask or a filter region to
                   clip — the glow simply runs out of alpha before it runs out of box. */}
@@ -171,7 +172,7 @@ export default function Hero() {
                 width={2558}
                 height={2098}
                 priority
-                sizes="(max-width: 640px) 128vw, (max-width: 1024px) 78vw, 61vw"
+                sizes="(max-width: 640px) 128vw, (max-width: 1024px) 86vw, 72vw"
                 className="relative h-auto w-full select-none object-contain"
                 style={MASK}
               />
