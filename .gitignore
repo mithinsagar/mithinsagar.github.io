@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# AI coding-tool instruction files — local to whoever is developing, not part of the site
+CLAUDE.md
+AGENTS.md
